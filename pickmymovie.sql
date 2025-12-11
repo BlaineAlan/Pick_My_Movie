@@ -30,7 +30,7 @@ CREATE TABLE movies (
     opening_weekend_us_canada_millions DECIMAL(12,2),
     mpaa_rating_id INT,
     director_id INT,
-    imdb_id VARCHAR(20),
+	rt_id VARCHAR(255) UNIQUE,
 
     FOREIGN KEY (mpaa_rating_id) REFERENCES mpaa_ratings(rating_id),
     FOREIGN KEY (director_id) REFERENCES directors(director_id)

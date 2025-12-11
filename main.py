@@ -6,42 +6,43 @@ import mysql.connector
 # #import tkinter as tk
 # #from tkinter import messagebox
 
-POSTER_DIR = "data/poster_downloads"
 
-poster_map = {}  # fill this with {title: filename}
+# POSTER_DIR = "data/poster_downloads"
 
-# Example:
-# poster_map["The Matrix"] = "7.8_tt0133093.jpg"
+# poster_map = {}  # fill this with {title: filename}
 
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="NewPassword123!",
-    database="pick_my_movie"
-)
-cur = conn.cursor()
+# # Example:
+# # poster_map["The Matrix"] = "7.8_tt0133093.jpg"
 
-sql = """
-    UPDATE movies
-    SET poster_url = %s
-    WHERE title = %s
-"""
+# conn = mysql.connector.connect(
+#     host="localhost",
+#     user="root",
+#     password="NewPassword123!",
+#     database="pick_my_movie"
+# )
+# cur = conn.cursor()
 
-for title, filename in poster_map.items():
-    file_path = f"{POSTER_DIR}/{filename}"
+# sql = """
+#     UPDATE movies
+#     SET poster_url = %s
+#     WHERE title = %s
+# """
 
-    # Ensure the file actually exists
-    if not os.path.exists(file_path):
-        print(f"⚠️ Missing file: {file_path}")
-        continue
+# for title, filename in poster_map.items():
+#     file_path = f"{POSTER_DIR}/{filename}"
 
-    cur.execute(sql, (file_path, title))
+#     # Ensure the file actually exists
+#     if not os.path.exists(file_path):
+#         print(f"⚠️ Missing file: {file_path}")
+#         continue
 
-conn.commit()
-cur.close()
-conn.close()
+#     cur.execute(sql, (file_path, title))
 
-print("Done assigning poster paths.")
+# conn.commit()
+# cur.close()
+# conn.close()
+
+# print("Done assigning poster paths.")
 
 # API_KEY = "73ff9e0c"
 # API_URL = "http://www.omdbapi.com/"
