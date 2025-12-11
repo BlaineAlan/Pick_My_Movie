@@ -30,6 +30,7 @@ CREATE TABLE movies (
     opening_weekend_us_canada_millions DECIMAL(12,2),
     mpaa_rating_id INT,
     director_id INT,
+    imdb_id VARCHAR(20),
 
     FOREIGN KEY (mpaa_rating_id) REFERENCES mpaa_ratings(rating_id),
     FOREIGN KEY (director_id) REFERENCES directors(director_id)
@@ -216,3 +217,9 @@ CREATE TABLE external_reviews (
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
     FOREIGN KEY (source_id) REFERENCES external_review_sources(source_id)
 );
+
+SELECT COUNT(*) FROM movies;
+SELECT COUNT(*) FROM genres;
+SELECT COUNT(*) FROM movie_genres;
+SELECT COUNT(*) FROM writers;
+SELECT COUNT(*) FROM movie_writers;
