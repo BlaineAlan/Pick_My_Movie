@@ -1,13 +1,17 @@
 import mysql.connector
 #import pandas as pd
-import requests
-import time
-#from _mysql_connector import errorcode
-#import tkinter as tk
-#from tkinter import messagebox
+# import requests
+# import time
+# #from _mysql_connector import errorcode
+# #import tkinter as tk
+# #from tkinter import messagebox
 
-API_KEY = "73ff9e0c"
-API_URL = "http://www.omdbapi.com/"
+POSTER_DIR = "data/poster_downloads"
+
+poster_map = {}  # fill this with {title: filename}
+
+# Example:
+# poster_map["The Matrix"] = "7.8_tt0133093.jpg"
 
 conn = mysql.connector.connect(
     host="localhost",
@@ -15,52 +19,85 @@ conn = mysql.connector.connect(
     password="NewPassword123!",
     database="pick_my_movie"
 )
+cur = conn.cursor()
 
-cur = conn.cursor(dictionary=True)
+sql = """
+    UPDATE movies
+    SET poster_url = %s
+    WHERE title = %s
+"""
 
-# Get all movies missing IMDB IDs
-cur.execute("SELECT movie_id, title, release_year FROM movies WHERE imdb_id IS NULL")
-movies = cur.fetchall()
+for title, filename in poster_map.items():
+    file_path = f"{POSTER_DIR}/{filename}"
 
-print(f"Found {len(movies)} movies missing IMDb ID.")
-
-not_found = []
-
-for m in movies:
-    params = {
-        "t": m["title"],
-        "y": m["release_year"],
-        "apikey": API_KEY
-    }
-
-    response = requests.get(API_URL, params=params)
-    data = response.json()
-
-    # OMDb returns {"Response":"False","Error":"Movie not found!"}
-    if data.get("Response") == "False":
-        print(f"❌ Not found: {m['title']} ({m['release_year']})")
-        not_found.append(m)
+    # Ensure the file actually exists
+    if not os.path.exists(file_path):
+        print(f"⚠️ Missing file: {file_path}")
         continue
 
-    imdb_id = data.get("imdbID")
+    cur.execute(sql, (file_path, title))
 
-    if imdb_id:
-        cur.execute(
-            "UPDATE movies SET imdb_id = %s WHERE movie_id = %s",
-            (imdb_id, m["movie_id"])
-        )
-        conn.commit()
-        print(f"✔ Updated {m['title']} → {imdb_id}")
-
-    # Be nice to the API (free tier is rate-limited)
-    time.sleep(0.25)
-
-print("\nDone! Movies not found:")
-for m in not_found:
-    print(f"{m['title']} ({m['release_year']})")
-
+conn.commit()
 cur.close()
 conn.close()
+
+print("Done assigning poster paths.")
+
+# API_KEY = "73ff9e0c"
+# API_URL = "http://www.omdbapi.com/"
+
+# conn = mysql.connector.connect(
+#     host="localhost",
+#     user="root",
+#     password="NewPassword123!",
+#     database="pick_my_movie"
+# )
+
+# cur = conn.cursor(dictionary=True)
+
+# # Get all movies missing IMDB IDs
+# cur.execute("SELECT movie_id, title, release_year FROM movies WHERE imdb_id IS NULL")
+# movies = cur.fetchall()
+
+# print(f"Found {len(movies)} movies missing IMDb ID.")
+
+# not_found = []
+
+# for m in movies:
+#     params = {
+#         "t": m["title"],
+#         "y": m["release_year"],
+#         "apikey": API_KEY
+#     }
+
+#     response = requests.get(API_URL, params=params)
+#     data = response.json()
+
+#     # OMDb returns {"Response":"False","Error":"Movie not found!"}
+#     if data.get("Response") == "False":
+#         print(f"❌ Not found: {m['title']} ({m['release_year']})")
+#         not_found.append(m)
+#         continue
+
+#     imdb_id = data.get("imdbID")
+
+#     if imdb_id:
+#         cur.execute(
+#             "UPDATE movies SET imdb_id = %s WHERE movie_id = %s",
+#             (imdb_id, m["movie_id"])
+#         )
+#         conn.commit()
+#         print(f"✔ Updated {m['title']} → {imdb_id}")
+
+#     # Be nice to the API (free tier is rate-limited)
+#     time.sleep(0.25)
+
+# print("\nDone! Movies not found:")
+# for m in not_found:
+#     print(f"{m['title']} ({m['release_year']})")
+
+# cur.close()
+# conn.close()
 
 # CSV_PATH = 'IMDbMovies-Clean.csv'
 
