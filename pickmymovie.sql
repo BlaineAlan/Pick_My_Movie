@@ -85,6 +85,8 @@ CREATE TABLE user_reviews (
         ON DELETE CASCADE
 );
 
+
+
 DROP TABLE IF EXISTS user_watch_history;
 CREATE TABLE user_watch_history (
     history_id INT AUTO_INCREMENT PRIMARY KEY,

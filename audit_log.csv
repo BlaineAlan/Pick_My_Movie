@@ -1,0 +1,8 @@
+log_id,user_id,action_type,action_timestamp,metadata
+1,1,submit_review,2025-12-11 16:57:01,"{""rating"": 2.0, ""movie_id"": ""8778""}"
+2,1,submit_review,2025-12-11 16:57:14,"{""rating"": 2.0, ""movie_id"": ""8778""}"
+3,1,delete_review,2025-12-11 16:57:22,"{""movie_id"": ""8778""}"
+4,1,Logged in,2025-12-11 17:02:18,
+5,1,submit_review,2025-12-11 17:02:30,"{""rating"": 5.0, ""movie_id"": ""8778""}"
+6,1,submit_review,2025-12-11 17:02:36,"{""rating"": 5.0, ""movie_id"": ""8778""}"
+7,1,delete_review,2025-12-11 17:02:43,"{""movie_id"": ""8778""}"
