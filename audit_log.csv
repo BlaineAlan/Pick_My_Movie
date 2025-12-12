@@ -6,3 +6,48 @@ log_id,user_id,action_type,action_timestamp,metadata
 5,1,submit_review,2025-12-11 17:02:30,"{""rating"": 5.0, ""movie_id"": ""8778""}"
 6,1,submit_review,2025-12-11 17:02:36,"{""rating"": 5.0, ""movie_id"": ""8778""}"
 7,1,delete_review,2025-12-11 17:02:43,"{""movie_id"": ""8778""}"
+8,1,Logged in,2025-12-11 17:35:19,
+9,1,Logged in,2025-12-11 17:36:57,
+10,1,Logged in,2025-12-11 17:38:20,
+11,1,Logged in,2025-12-11 17:42:39,
+12,,Signed up,2025-12-11 17:47:31,
+13,2,Logged in,2025-12-11 17:47:35,
+14,2,Logged in,2025-12-11 18:04:02,
+15,2,Logged in,2025-12-11 18:05:59,
+16,2,Logged in,2025-12-11 18:07:09,
+17,2,submit_review,2025-12-11 18:08:55,"{""rating"": 9.3, ""movie_id"": ""7815""}"
+18,2,submit_review,2025-12-11 18:09:14,"{""rating"": 3.0, ""movie_id"": ""7815""}"
+19,2,delete_review,2025-12-11 18:09:24,"{""movie_id"": ""7815""}"
+20,2,Logged in,2025-12-11 18:14:48,
+21,2,view_recommendations,2025-12-11 18:14:51,
+22,2,submit_review,2025-12-11 18:15:09,"{""rating"": 10.0, ""movie_id"": ""8778""}"
+23,2,view_recommendations,2025-12-11 18:15:21,
+24,2,view_recommendations,2025-12-11 18:15:46,
+25,2,submit_review,2025-12-11 18:16:24,"{""rating"": 10.0, ""movie_id"": ""7900""}"
+26,2,submit_review,2025-12-11 18:16:30,"{""rating"": 10.0, ""movie_id"": ""3571""}"
+27,2,delete_review,2025-12-11 18:16:39,"{""movie_id"": ""8778""}"
+28,2,view_recommendations,2025-12-11 18:16:42,
+29,2,view_recommendations,2025-12-11 18:16:59,
+30,2,Logged in,2025-12-11 18:54:26,
+31,2,Logged in,2025-12-11 18:56:48,
+32,2,Logged in,2025-12-11 18:57:54,
+33,1,Logged in,2025-12-11 18:58:58,
+34,2,Logged in,2025-12-11 19:02:44,
+35,2,Logged in,2025-12-11 19:03:51,
+36,2,submit_review,2025-12-11 19:04:09,"{""rating"": 2.0, ""movie_id"": ""8778""}"
+37,2,delete_review,2025-12-11 19:04:15,"{""movie_id"": ""8778""}"
+38,1,Logged in,2025-12-11 19:04:29,
+39,2,Logged in,2025-12-11 19:06:38,
+40,2,Logged in,2025-12-11 19:07:56,
+41,2,Logged in,2025-12-11 19:08:57,
+42,2,view_recommendations,2025-12-11 19:08:58,
+43,2,submit_review,2025-12-11 19:09:14,"{""rating"": 2.0, ""movie_id"": ""8778""}"
+44,2,delete_review,2025-12-11 19:09:21,"{""movie_id"": ""8778""}"
+45,2,view_recommendations,2025-12-11 19:09:25,
+46,,Signed up,2025-12-11 19:18:21,
+47,3,Logged in,2025-12-11 19:18:27,
+48,3,submit_review,2025-12-11 19:20:32,"{""rating"": 5.0, ""movie_id"": ""2926""}"
+49,3,submit_review,2025-12-11 19:20:52,"{""rating"": 10.0, ""movie_id"": ""2926""}"
+50,3,delete_review,2025-12-11 19:21:03,"{""movie_id"": ""2926""}"
+51,2,Logged in,2025-12-11 19:21:24,
+52,2,view_recommendations,2025-12-11 19:21:42,

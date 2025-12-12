@@ -1,9 +1,6 @@
 CREATE DATABASE pick_my_movie;
 USE pick_my_movie;
 
-SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS movies;
-SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE mpaa_ratings (
     rating_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -130,16 +127,6 @@ CREATE TABLE movie_directors (
         ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS movie_posters;
-CREATE TABLE movie_posters (
-    poster_id INT AUTO_INCREMENT PRIMARY KEY,
-    movie_id INT NOT NULL,
-    poster_url VARCHAR(500),
-    source_dataset VARCHAR(255),
-
-    FOREIGN KEY (movie_id) REFERENCES movies(movie_id)
-        ON DELETE CASCADE
-);
 
 DROP TABLE IF EXISTS streaming_platforms;
 CREATE TABLE streaming_platforms (
@@ -213,15 +200,108 @@ CREATE TABLE external_reviews (
     external_review_id INT AUTO_INCREMENT PRIMARY KEY,
     movie_id INT NOT NULL,
     source_id INT NOT NULL,
-    score DECIMAL(4,1), -- e.g. Rotten Tomatoes %, Metacritic score
+    score DECIMAL(4,1), 
     review_count INT,
 
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
     FOREIGN KEY (source_id) REFERENCES external_review_sources(source_id)
 );
 
-SELECT COUNT(*) FROM movies;
-SELECT COUNT(*) FROM genres;
-SELECT COUNT(*) FROM movie_genres;
-SELECT COUNT(*) FROM writers;
-SELECT COUNT(*) FROM movie_writers;
+DROP TABLE IF EXISTS tmp_csv_movies;
+CREATE TABLE tmp_csv_movies (
+    ID INT,
+    Title VARCHAR(255),
+    Year INT,
+    Age VARCHAR(10),
+    `Rotten Tomatoes` DECIMAL(4,1),
+     Netflix TINYINT(1),
+     Hulu TINYINT(1),
+    `Prime Video` TINYINT(1),
+    `Disney+` TINYINT(1),
+    Type VARCHAR(50)
+);
+
+LOAD DATA LOCAL INFILE 'Users/blaine/CS_3620_SQL/Pick_My_Movie/MoviesOnStreamingPlatforms.csv'
+INTO TABLE tmp_csv_movies
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(ID, Title, Year, Age, `Rotten Tomatoes`, Netflix, Hulu, `Prime Video`, `Disney+`, Type);
+
+
+SET GLOBAL local_infile = 1;
+
+INSERT IGNORE INTO mpaa_ratings (rating_code)
+SELECT DISTINCT Age FROM tmp_csv_movies;
+
+INSERT IGNORE INTO streaming_platforms (platform_name)
+VALUES ('Netflix'), ('Hulu'), ('Prime Video'), ('Disney+');
+
+INSERT INTO movie_streaming (movie_id, platform_id)
+SELECT
+    ID,
+    (SELECT platform_id FROM streaming_platforms WHERE platform_name='Netflix')
+FROM tmp_csv_movies
+WHERE Netflix = 1;
+
+
+INSERT INTO movie_streaming (movie_id, platform_id)
+SELECT m.movie_id, sp.platform_id
+FROM tmp_csv_movies t
+JOIN movies m ON m.title = t.Title
+JOIN streaming_platforms sp ON sp.platform_name = 'Hulu'
+WHERE t.Hulu = 1;
+
+
+INSERT IGNORE INTO external_review_sources (source_name) VALUES ('Rotten Tomatoes');
+
+INSERT INTO external_reviews (movie_id, source_id, score)
+SELECT m.movie_id,
+       ers.source_id,
+       t.`Rotten Tomatoes`
+FROM tmp_csv_movies t
+JOIN movies m ON LOWER(m.title) = LOWER(t.Title)
+JOIN external_review_sources ers ON ers.source_name = 'Rotten Tomatoes'
+WHERE t.`Rotten Tomatoes` IS NOT NULL;
+
+
+INSERT INTO movie_streaming (movie_id, platform_id)
+SELECT
+    ID,
+    (SELECT platform_id FROM streaming_platforms WHERE platform_name='Prime Video')
+FROM tmp_csv_movies
+WHERE `Prime Video` = 1;
+
+INSERT INTO movie_streaming (movie_id, platform_id)
+SELECT
+    ID,
+    (SELECT platform_id FROM streaming_platforms WHERE platform_name='Disney+')
+FROM tmp_csv_movies
+WHERE `Disney+` = 1;
+
+DROP TABLE IF EXISTS tmp_csv_movies;
+CREATE TABLE tmp_csv_movies (
+    title VARCHAR(255),
+    release_year INT,
+    age VARCHAR(10),
+    rotten_tomatoes DECIMAL(4,1),
+    netflix TINYINT,
+    hulu TINYINT,
+    prime_video TINYINT,
+    disney_plus TINYINT
+);
+
+LOAD DATA LOCAL INFILE 'Users/blaine/CS_3620_SQL/Pick_My_Movie/Movies_clean.csv'
+INTO TABLE tmp_csv_movies
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(title, release_year, age, rotten_tomatoes, netflix, hulu, prime_video, disney_plus);
+
+INSERT INTO external_reviews (movie_id, source_id, score)
+SELECT m.movie_id, ers.source_id, tmp.rotten_tomatoes
+FROM tmp_csv_movies tmp
+JOIN movies m ON m.title = tmp.title AND m.release_year = tmp.release_year
+JOIN external_review_sources ers ON ers.source_name='Rotten Tomatoes'
+WHERE tmp.rotten_tomatoes IS NOT NULL;

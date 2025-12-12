@@ -1,0 +1,129 @@
+from db import cur, conn 
+
+# -----------------------------
+# 1. MPAA RATINGS
+# -----------------------------
+ratings = df['Motion Picture Rating'].unique()
+rating_map = {}
+
+for r in ratings:
+    if r.strip() == '':
+        continue
+    cur.execute("INSERT IGNORE INTO mpaa_ratings (rating_code) VALUES (%s)", (r,))
+    conn.commit()
+    cur.execute("SELECT rating_id FROM mpaa_ratings WHERE rating_code=%s", (r,))
+    rating_map[r] = cur.fetchone()[0]
+
+print("MPAA ratings loaded.")
+
+# -----------------------------
+# 2. GENRES
+# -----------------------------
+all_genres = set()
+for g in df['Main Genres']:
+    for genre in g.split(','):
+        genre = genre.strip()
+        if genre:
+            all_genres.add(genre)
+
+genre_map = {}
+for genre in all_genres:
+    cur.execute("INSERT IGNORE INTO genres (genre_name) VALUES (%s)", (genre,))
+    conn.commit()
+    cur.execute("SELECT genre_id FROM genres WHERE genre_name=%s", (genre,))
+    genre_map[genre] = cur.fetchone()[0]
+
+print("Genres loaded.")
+
+# -----------------------------
+# 3. DIRECTORS
+# -----------------------------
+all_directors = df['Director'].unique()
+director_map = {}
+
+for d in all_directors:
+    d = d.strip()
+    if not d:
+        continue
+    cur.execute("INSERT IGNORE INTO directors (director_name) VALUES (%s)", (d,))
+    conn.commit()
+    cur.execute("SELECT director_id FROM directors WHERE director_name=%s", (d,))
+    result = cur.fetchone()
+    if result:
+        director_map[d] = result[0]
+
+print("Directors loaded.")
+
+# -----------------------------
+# 4. WRITERS
+# -----------------------------
+all_writers = set()
+for w_list in df['Writer']:
+    for w in w_list.split(','):
+        w = w.strip()
+        if w:
+            all_writers.add(w)
+
+writer_map = {}
+for w in all_writers:
+    cur.execute("INSERT IGNORE INTO writers (writer_name) VALUES (%s)", (w,))
+    conn.commit()
+    cur.execute("SELECT writer_id FROM writers WHERE writer_name=%s", (w,))
+    writer_map[w] = cur.fetchone()[0]
+
+print("Writers loaded.")
+
+# -----------------------------
+# 5. MOVIES + Junction Tables
+# -----------------------------
+
+def safe_float(val):
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return None
+
+for idx, row in df.iterrows():
+    title = row['Title']
+    summary = row['Summary']
+    year = int(row['Release Year']) if row['Release Year'] else None
+    runtime = safe_float(row['Runtime (Minutes)']) if row['Runtime (Minutes)'] else None
+    imdb_rating = safe_float(row['Rating (Out of 10)']) if row['Rating (Out of 10)'] else None
+    num_ratings = safe_float(row['Number of Ratings (in thousands)']) if row['Number of Ratings (in thousands)'] else None
+    budget = safe_float(row['Budget (in millions)']) if row['Budget (in millions)'] else None
+    gross_us = safe_float(row['Gross in US & Canada (in millions)']) if row['Gross in US & Canada (in millions)'] else None
+    gross_world = safe_float(row['Gross worldwide (in millions)']) if row['Gross worldwide (in millions)'] else None
+    opening_weekend = safe_float(row['Opening Weekend in US & Canada']) if row['Opening Weekend in US & Canada'] else None
+    rating_id = rating_map.get(row['Motion Picture Rating'], None)
+    director_id = director_map.get(row['Director'], None)
+
+    # Insert movie
+    cur.execute("""
+        INSERT INTO movies
+        (title, summary, release_year, runtime_minutes, imdb_rating, num_ratings_k,
+         budget_millions, gross_us_canada_millions, gross_worldwide_millions, 
+         opening_weekend_us_canada_millions, mpaa_rating_id, director_id)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (title, summary, year, runtime, imdb_rating, num_ratings, budget,
+          gross_us, gross_world, opening_weekend, rating_id, director_id))
+    conn.commit()
+
+    cur.execute("SELECT movie_id FROM movies WHERE title=%s", (title,))
+    movie_id = cur.fetchone()[0]
+
+    # Insert genres
+    for g in row['Main Genres'].split(','):
+        g = g.strip()
+        if g:
+            cur.execute("INSERT IGNORE INTO movie_genres (movie_id, genre_id) VALUES (%s, %s)", (movie_id, genre_map[g]))
+    conn.commit()
+
+    # Insert writers
+    for w in row['Writer'].split(','):
+        w = w.strip()
+        if w:
+            cur.execute("INSERT IGNORE INTO movie_writers (movie_id, writer_id) VALUES (%s, %s)", (movie_id, writer_map[w]))
+    conn.commit()
+
+print("Movies, genres, and writers loaded successfully.")
+conn.close()
