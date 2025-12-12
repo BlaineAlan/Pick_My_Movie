@@ -3,7 +3,6 @@ import csv
 from db import cur, conn
 
 def log_action(user_id, action_type, metadata=None):
-    """Insert an action into the audit_log table."""
     try:
         cur.execute("""
             INSERT INTO audit_log (user_id, action_type, metadata)

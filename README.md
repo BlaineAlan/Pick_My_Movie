@@ -26,6 +26,14 @@ The goal of this project is to use a core database of movies on imdb, which incl
 
 The user can make an account, search for movies, leave reviews, and interact with recommended movies to find even more movies to watch.
 
+# Github Link
+
+https://github.com/BlaineAlan/Pick_My_Movie
+
 # Video recording
 
+https://drive.google.com/file/d/1QY1_ymH0BPzniXFr4pO3f56LZzABlu-9/view?usp=sharing
+
 # ER diagram
+
+https://drive.google.com/file/d/1H_us8wEEQwYtMXyizYrGcqyx0Si9QLkq/view?usp=sharing
